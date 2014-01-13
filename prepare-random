@@ -1,0 +1,45 @@
+#
+### BEGIN INIT INFO
+# Provides:          prepare-random
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Required-Start:
+# Required-Stop:
+# Short-Description: Writes 2048 random unsigned bytes to /var/random
+# Description:       Writes 2048 random unsigned bytes to /var/random
+### END INIT INFO
+
+#
+# main()
+#
+case "${1:-''}" in
+  start)
+    c=0;
+
+    for i in $( od -An -N2048 -t u1 /dev/hwrng ); do
+      if [ $c -eq 0 ]
+      then
+          random=$i
+      else
+          random=$random,$i
+      fi
+
+      c=$((c+1))
+    done
+
+    echo $random > /tmp/random
+    chmod 755 /tmp/random
+    ;;
+  stop)
+    ;;
+  restart)
+   ;;
+  reload|force-reload)
+   ;;
+  status)
+   ;;
+  *)
+   echo "Usage: $SELF start"
+   exit 1
+   ;;
+esac
